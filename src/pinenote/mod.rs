@@ -7,6 +7,7 @@ pub mod ebc;
 
 
 pub struct Pinenote<'a> {
+    #[allow(dead_code)]
     dbus_connection: Connection,
     ebc: ebc::Ebc<'a>,
 }
