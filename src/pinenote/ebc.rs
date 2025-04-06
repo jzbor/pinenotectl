@@ -49,8 +49,7 @@ impl Ebc<'_> {
         self.interface.set_dclk_select(dclk_val)
             .map_err(|e| e.to_string())?;
         self.interface.request_quality_or_performance_mode(qop_val)
-            .map_err(|e| e.to_string())?;
-        Ok(())
+            .map_err(|e| e.to_string())
     }
 
     pub fn get_performance_mode(&self) -> Result<OnOffState, String> {
@@ -106,6 +105,38 @@ impl Ebc<'_> {
             .next();
         Ok(())
     }
+
+    pub fn set_auto_refresh(&self, state: OnOffState) -> Result<(), String> {
+        self.interface.set_auto_refresh(state.into())
+            .map_err(|e| e.to_string())
+    }
+
+    pub fn get_auto_refresh(&self) -> Result<OnOffState, String> {
+        self.interface.get_auto_refresh()
+            .map(|v| v.into())
+            .map_err(|e| e.to_string())
+    }
+
+    pub fn change_auto_refresh(&self, state: OnOffToggleState) -> Result<(), String> {
+        use OnOffToggleState::*;
+        match state {
+            Toggle => self.set_auto_refresh(!(self.get_auto_refresh()?)),
+            other => self.set_auto_refresh(other.try_into().unwrap()),
+        }
+    }
+
+    pub fn print_auto_refresh(&self) -> Result<(), String> {
+        println!("auto-refresh:{}{}", PRINT_VALUE_DIVIDER, self.get_auto_refresh()?);
+        Ok(())
+    }
+
+    pub fn await_auto_refresh_change(&self) -> Result<(), String> {
+        self.interface.receive_auto_refresh_changed()
+            .map_err(|e| e.to_string())?
+            .next();
+        Ok(())
+    }
+
 }
 
 impl TryFrom<u8> for Waveform {

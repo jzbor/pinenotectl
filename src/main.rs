@@ -22,6 +22,9 @@ enum Command {
     /// Wait for a certain event
     Await(AwaitArgs),
 
+    /// Manage auto refresh setting
+    AutoRefresh(#[clap(flatten)] AutoRefreshArgs),
+
     /// Do a full refresh of the eink screen
     FullRefresh(FullRefreshArgs),
 
@@ -39,6 +42,12 @@ enum Command {
 
     /// Manage eink panel waveform
     Waveform(#[clap(flatten)] WaveformArgs),
+}
+
+#[derive(Parser, Debug)]
+struct AutoRefreshArgs {
+    /// Change current auto refresh setting
+    action: Option<OnOffToggleState>,
 }
 
 #[derive(Parser, Debug)]
@@ -75,8 +84,10 @@ struct WaveformArgs {
     waveform_opt: Option<Waveform>,
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(ValueEnum, Clone, Copy, Debug)]
 enum AwaitTarget {
+    AutoRefreshChanged,
     PerformanceModeChanged,
     TravelModeChanged,
     WaveformChanged,
@@ -97,6 +108,7 @@ impl Command {
     fn exec(self, pinenote: Pinenote) -> Result<(), String> {
         use Command::*;
         match self {
+            AutoRefresh(args) => Self::auto_refresh(args, pinenote),
             Await(args) => Self::r#await(args, pinenote),
             FullRefresh(_) => Self::refresh(pinenote),
             Info(_) => Self::info(pinenote),
@@ -104,6 +116,14 @@ impl Command {
             TravelMode(args) => Self::travel_mode(args, pinenote),
             Waveform(args) => Self::waveform(args, pinenote),
         }
+    }
+
+    fn auto_refresh(args: AutoRefreshArgs, pinenote: Pinenote) -> Result<(), String> {
+        if let Some(a) = args.action {
+            pinenote.ebc().change_auto_refresh(a)?;
+        }
+        pinenote.ebc().print_auto_refresh()?;
+        Ok(())
     }
 
     fn performance_mode(args: PerformanceModeArgs, pinenote: Pinenote) -> Result<(), String> {
@@ -134,6 +154,7 @@ impl Command {
         pinenote.print_travel_mode()?;
         pinenote.ebc().print_waveform()?;
         pinenote.ebc().print_performance_mode()?;
+        pinenote.ebc().print_auto_refresh()?;
         Ok(())
     }
 
@@ -145,12 +166,14 @@ impl Command {
         loop {
             use AwaitTarget::*;
             match args.target {
+                AutoRefreshChanged => pinenote.ebc().await_auto_refresh_change()?,
                 PerformanceModeChanged => pinenote.ebc().await_performance_mode_change()?,
                 TravelModeChanged => pinenote.await_travel_mode_change()?,
                 WaveformChanged => pinenote.ebc().await_waveform_change()?,
             }
 
             match args.target {
+                AutoRefreshChanged => pinenote.ebc().print_auto_refresh()?,
                 PerformanceModeChanged => pinenote.ebc().print_performance_mode()?,
                 TravelModeChanged => pinenote.print_travel_mode()?,
                 WaveformChanged => pinenote.ebc().print_waveform()?,
