@@ -23,7 +23,7 @@ pub enum Waveform {
     GLD16 = 8,
 }
 
-impl<'a> Ebc<'a> {
+impl Ebc<'_> {
     pub fn new(dbus_connection: &Connection) -> Result<Self, String> {
         let interface = EbcProxyBlocking::new(dbus_connection)
             .map_err(|e| e.to_string())?;

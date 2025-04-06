@@ -26,7 +26,7 @@ pub enum OnOffState {
 }
 
 
-impl<'a> Pinenote<'a> {
+impl Pinenote<'_> {
     pub fn new() -> Result<Self, String> {
         let dbus_connection = Connection::system()
             .map_err(|e| e.to_string())?;
@@ -89,7 +89,7 @@ impl TryFrom<OnOffToggleState> for OnOffState {
         match state {
             On => Ok(OnOffState::On),
             Off => Ok(OnOffState::Off),
-            Toggle => Err(format!("Attempting to conver 'Toggle' value to OnOffState")),
+            Toggle => Err("Attempting to conver 'Toggle' value to OnOffState".to_string()),
         }
     }
 }
