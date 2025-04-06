@@ -25,6 +25,9 @@ enum Command {
     /// Do a full refresh of the eink screen
     FullRefresh(FullRefreshArgs),
 
+    /// Print information on all available parameters
+    Info(InfoArgs),
+
     /// Manage eink panel performance mode
     ///
     /// Performance mode brings faster refreshes, but may be prone to fragments
@@ -50,6 +53,9 @@ struct AwaitArgs {
 
 #[derive(Parser, Debug)]
 struct FullRefreshArgs {}
+
+#[derive(Parser, Debug)]
+struct InfoArgs {}
 
 #[derive(Parser, Debug)]
 struct PerformanceModeArgs {
@@ -93,6 +99,7 @@ impl Command {
         match self {
             Await(args) => Self::r#await(args, pinenote),
             FullRefresh(_) => Self::refresh(pinenote),
+            Info(_) => Self::info(pinenote),
             PerformanceMode(args) => Self::performance_mode(args, pinenote),
             TravelMode(args) => Self::travel_mode(args, pinenote),
             Waveform(args) => Self::waveform(args, pinenote),
@@ -123,6 +130,12 @@ impl Command {
         Ok(())
     }
 
+    fn info(pinenote: Pinenote) -> Result<(), String> {
+        pinenote.print_travel_mode()?;
+        pinenote.ebc().print_waveform()?;
+        pinenote.ebc().print_performance_mode()?;
+        Ok(())
+    }
 
     fn refresh(pinenote: Pinenote) -> Result<(), String> {
         pinenote.ebc().full_refresh()
