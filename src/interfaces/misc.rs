@@ -18,8 +18,8 @@
 //! [Writing a client proxy]: https://dbus2.github.io/zbus/client.html
 //! [D-Bus standard interfaces]: https://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces,
 use zbus::proxy;
-#[proxy(interface = "org.pinenote.misc", assume_defaults = true)]
-pub trait misc {
+#[proxy(interface = "org.pinenote.misc", default_path = "/misc", default_service = "org.pinenote.misc")]
+pub trait Misc {
     /// DisableTravelMode method
     fn disable_travel_mode(&self) -> zbus::Result<()>;
 

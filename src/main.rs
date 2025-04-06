@@ -22,6 +22,7 @@ enum Command {
     Await(AwaitArgs),
     FullRefresh(FullRefreshArgs),
     PerformanceMode(#[clap(flatten)] PerformanceModeArgs),
+    TravelMode(#[clap(flatten)] TravelModeArgs),
     Waveform(#[clap(flatten)] WaveformArgs),
 }
 
@@ -42,6 +43,11 @@ struct PerformanceModeArgs {
 }
 
 #[derive(Parser, Debug)]
+struct TravelModeArgs {
+    action: Option<OnOffToggleState>,
+}
+
+#[derive(Parser, Debug)]
 struct WaveformArgs {
     waveform_opt: Option<Waveform>,
 }
@@ -49,6 +55,7 @@ struct WaveformArgs {
 #[derive(ValueEnum, Clone, Copy, Debug)]
 enum AwaitTarget {
     PerformanceModeChanged,
+    TravelModeChanged,
     WaveformChanged,
 }
 
@@ -70,6 +77,7 @@ impl Command {
             Await(args) => Self::r#await(args, pinenote),
             FullRefresh(_) => Self::refresh(pinenote),
             PerformanceMode(args) => Self::performance_mode(args, pinenote),
+            TravelMode(args) => Self::travel_mode(args, pinenote),
             Waveform(args) => Self::waveform(args, pinenote),
         }
     }
@@ -79,6 +87,14 @@ impl Command {
             pinenote.ebc().change_performance_mode(a)?;
         }
         pinenote.ebc().print_performance_mode()?;
+        Ok(())
+    }
+
+    fn travel_mode(args: TravelModeArgs, pinenote: Pinenote) -> Result<(), String> {
+        if let Some(a) = args.action {
+            pinenote.change_travel_mode(a)?;
+        }
+        pinenote.print_travel_mode()?;
         Ok(())
     }
 
@@ -100,11 +116,13 @@ impl Command {
             use AwaitTarget::*;
             match args.target {
                 PerformanceModeChanged => pinenote.ebc().await_performance_mode_change()?,
+                TravelModeChanged => pinenote.await_travel_mode_change()?,
                 WaveformChanged => pinenote.ebc().await_waveform_change()?,
             }
 
             match args.target {
                 PerformanceModeChanged => pinenote.ebc().print_performance_mode()?,
+                TravelModeChanged => pinenote.print_travel_mode()?,
                 WaveformChanged => pinenote.ebc().print_waveform()?,
             }
 
