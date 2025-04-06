@@ -8,6 +8,9 @@ use crate::interfaces::misc::MiscProxyBlocking;
 pub mod ebc;
 
 
+pub const PRINT_VALUE_DIVIDER: &str = "\t";
+
+
 pub struct Pinenote<'a> {
     #[allow(dead_code)]
     dbus_connection: Connection,
@@ -72,7 +75,7 @@ impl Pinenote<'_> {
     }
 
     pub fn print_travel_mode(&self) -> Result<(), String> {
-        println!("travel-mode: {}", self.get_travel_mode()?);
+        println!("travel-mode:{}{}", PRINT_VALUE_DIVIDER, self.get_travel_mode()?);
         Ok(())
     }
 

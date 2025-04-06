@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use zbus::blocking::Connection;
 
-use crate::interfaces::ebc::EbcProxyBlocking;
+use crate::{interfaces::ebc::EbcProxyBlocking, pinenote::PRINT_VALUE_DIVIDER};
 use super::{OnOffState, OnOffToggleState};
 
 
@@ -73,7 +73,7 @@ impl Ebc<'_> {
     }
 
     pub fn print_performance_mode(&self) -> Result<(), String> {
-        println!("performance-mode: {}", self.get_performance_mode()?);
+        println!("performance-mode:{}{}", PRINT_VALUE_DIVIDER, self.get_performance_mode()?);
         Ok(())
     }
 
@@ -96,7 +96,7 @@ impl Ebc<'_> {
     }
 
     pub fn print_waveform(&self) -> Result<(), String> {
-        println!("waveform: {}", self.get_waveform()?);
+        println!("waveform:{}{}", PRINT_VALUE_DIVIDER, self.get_waveform()?);
         Ok(())
     }
 
