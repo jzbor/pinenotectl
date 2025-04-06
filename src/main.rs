@@ -19,17 +19,31 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Command {
+    /// Wait for a certain event
     Await(AwaitArgs),
+
+    /// Do a full refresh of the eink screen
     FullRefresh(FullRefreshArgs),
+
+    /// Manage eink panel performance mode
+    ///
+    /// Performance mode brings faster refreshes, but may be prone to fragments
+    /// and a lower image quality overall.
     PerformanceMode(#[clap(flatten)] PerformanceModeArgs),
+
+    /// Manage travel mode (disables lid wakeup)
     TravelMode(#[clap(flatten)] TravelModeArgs),
+
+    /// Manage eink panel waveform
     Waveform(#[clap(flatten)] WaveformArgs),
 }
 
 #[derive(Parser, Debug)]
 struct AwaitArgs {
+    /// Event to wait for
     target: AwaitTarget,
 
+    /// Wait in a loop, outputting a new line at every event
     #[clap(short, long)]
     r#loop: bool,
 }
@@ -39,16 +53,19 @@ struct FullRefreshArgs {}
 
 #[derive(Parser, Debug)]
 struct PerformanceModeArgs {
+    /// Change current performance mode setting
     action: Option<OnOffToggleState>,
 }
 
 #[derive(Parser, Debug)]
 struct TravelModeArgs {
+    /// Change current travel mode setting
     action: Option<OnOffToggleState>,
 }
 
 #[derive(Parser, Debug)]
 struct WaveformArgs {
+    /// Waveform setting
     waveform_opt: Option<Waveform>,
 }
 

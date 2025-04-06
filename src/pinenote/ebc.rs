@@ -10,6 +10,10 @@ pub struct Ebc<'a> {
     interface: EbcProxyBlocking<'a>,
 }
 
+/// Waveform identifier
+///
+/// * [https://github.com/zephray/NekoInk/wiki/Waveform-for-the-screen](https://github.com/zephray/NekoInk/wiki/Waveform-for-the-screen)
+/// * [https://www.waveshare.net/w/upload/c/c4/E-paper-mode-declaration.pdf](https://www.waveshare.net/w/upload/c/c4/E-paper-mode-declaration.pdf)
 #[derive(clap::ValueEnum, Clone, Copy, Debug)]
 #[repr(u8)]
 pub enum Waveform {
